@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 152 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 20% 10%;
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 175 55% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 152 60% 45%;
+    --radius: 0.75rem;
+
+    --success: 152 60% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 10%;
+    --danger: 0 72% 55%;
+    --danger-foreground: 0 0% 100%;
+
+    --glass-bg: 220 20% 97% / 0.6;
+    --glass-border: 220 15% 88% / 0.5;
+
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 220 10% 70%;
+    --sidebar-primary: 152 60% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 14%;
+    --sidebar-accent-foreground: 220 10% 90%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-ring: 152 60% 45%;
+  }
+
+  .dark {
+    --background: 222 47% 4%;
+    --foreground: 222 10% 90%;
+    --card: 222 47% 8%;
+    --card-foreground: 222 10% 90%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 222 10% 90%;
+    --primary: 152 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 25% 12%;
+    --secondary-foreground: 222 10% 90%;
+    --muted: 222 25% 12%;
+    --muted-foreground: 222 10% 50%;
+    --accent: 175 55% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 20% 15%;
+    --input: 222 20% 15%;
+    --ring: 152 60% 45%;
+
+    --success: 152 60% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 10%;
+    --danger: 0 72% 55%;
+    --danger-foreground: 0 0% 100%;
+
+    --glass-bg: 222 47% 8% / 0.7;
+    --glass-border: 222 20% 25% / 0.5;
+
+    --sidebar-background: 222 47% 5%;
+    --sidebar-foreground: 222 10% 65%;
+    --sidebar-primary: 152 60% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 25% 10%;
+    --sidebar-accent-foreground: 222 10% 95%;
+    --sidebar-border: 222 20% 10%;
+    --sidebar-ring: 152 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/40 backdrop-blur-xl border border-border/10 rounded-xl shadow-2xl;
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.05), transparent);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:bg-card/60 hover:border-primary/30 hover:shadow-primary/10 hover:shadow-2xl;
+  }
+
+  .nav-item-active {
+    @apply bg-gradient-to-r from-primary/20 via-primary/10 to-transparent text-primary font-medium;
+    position: relative;
+    box-shadow: inset 2px 0 0 0 hsl(var(--primary));
+  }
+
+  .nav-item-active::before {
+    content: '';
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full shadow-[0_0_10px_rgba(var(--primary),0.5)];
+  }
+
+  .sidebar-glass {
+    @apply bg-sidebar/80 backdrop-blur-2xl border-r border-sidebar-border;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), transparent);
+  }
+
+  .status-up {
+    @apply text-success bg-success/10 border-success/20;
+  }
+
+  .status-down {
+    @apply text-danger bg-danger/10 border-danger/20;
+  }
+
+  .status-warning {
+    @apply text-warning bg-warning/10 border-warning/20;
+  }
+
+  .pulse-dot {
+    @apply relative;
+  }
+
+  .pulse-dot::after {
+    content: '';
+    @apply absolute inset-0 rounded-full animate-ping;
+    background: inherit;
+    opacity: 0.4;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
