@@ -36,8 +36,8 @@ connectDB().then(() => {
 // Serve frontend in production
 const frontendBuild = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendBuild));
-// Catch-all: return index.html for client-side routes
-app.get('*', (req, res) => {
+// Catch-all: return index.html for client-side routes (Express 5 syntax)
+app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(frontendBuild, 'index.html'));
 });
 
