@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./db');
 const { startScheduler } = require('./services/scheduler');
 const authRoutes = require('./routes/auth');
@@ -29,7 +30,15 @@ app.use('/api/exports', require('./routes/exports'));
 
 connectDB().then(() => {
     console.log('Starting Scheduler Engine...');
-    startScheduler(); // Start the loop for checking websites
+    startScheduler();
+});
+
+// Serve frontend in production
+const frontendBuild = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendBuild));
+// Catch-all: return index.html for client-side routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuild, 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
