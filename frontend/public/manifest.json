@@ -3,9 +3,9 @@
   "short_name": "PulseGuard",
   "description": "Monitor your website uptime, response times, and get instant alerts when your services go down.",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0d6efd",
+  "display": "fullscreen",
+  "background_color": "#020617",
+  "theme_color": "#020617",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
