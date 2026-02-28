@@ -1,4 +1,4 @@
-const CACHE_NAME = "pulseguard-pwa-v2";
+const CACHE_NAME = "pulseguard-pwa-v3";
 
 const urlsToCache = [
   "/",
