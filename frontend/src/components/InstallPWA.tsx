@@ -54,6 +54,10 @@ export function InstallPWA() {
     setIsDismissed(true);
   };
 
+  // Banner permanently disabled — return null always
+  return null;
+
+  /* Disabled install banner
   if (!supportsPWA || isDismissed) {
     return null;
   }
@@ -61,23 +65,53 @@ export function InstallPWA() {
   return (
     <AnimatePresence>
       <motion.div 
-        initial={{ y: 100, opacity: 0 }}
+        initial={{ y: '100%', opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] sm:w-[90%] max-w-sm"
+        exit={{ y: '100%', opacity: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        style={{ position: 'fixed', bottom: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, width: '100%', maxWidth: '420px', padding: '0 1rem', boxSizing: 'border-box' }}
       >
-        <div className="bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-4 overflow-hidden">
-          <div className="flex flex-col gap-0.5 sm:gap-1 overflow-hidden">
-            <h3 className="font-semibold text-sm">Install PulseGuard</h3>
-            <p className="text-[11px] sm:text-xs text-muted-foreground leading-tight">Add to homescreen for offline use</p>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          padding: '12px 14px',
+          borderRadius: '16px',
+          background: 'hsl(var(--background) / 0.97)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid hsl(var(--border) / 0.5)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0 }}>
+            <h3 style={{ fontWeight: 600, fontSize: '13px', margin: 0, color: 'hsl(var(--foreground))' }}>
+              Install PulseGuard
+            </h3>
+            <p style={{ fontSize: '11px', margin: 0, color: 'hsl(var(--muted-foreground))', lineHeight: 1.3 }}>
+              Add to homescreen for offline use
+            </p>
           </div>
           
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <Button size="sm" onClick={onClick} className="rounded-full shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 h-8 px-3 text-xs">
-              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <Button 
+              size="sm" 
+              onClick={onClick} 
+              className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/30"
+              style={{ height: '34px', padding: '0 16px', fontSize: '12px', flexShrink: 0 }}
+            >
+              <Download className="w-3.5 h-3.5 mr-1.5" />
               Install
             </Button>
-            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground" onClick={onDismiss}>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              style={{ height: '32px', width: '32px', flexShrink: 0 }}
+              className="rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/50" 
+              onClick={onDismiss}
+            >
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -85,4 +119,5 @@ export function InstallPWA() {
       </motion.div>
     </AnimatePresence>
   );
+  */
 }
