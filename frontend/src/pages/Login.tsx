@@ -40,6 +40,7 @@ export default function Login() {
   const loginWithGoogle = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => toast({ title: "Google Login Failed", variant: "destructive" }),
+    flow: 'auth-code',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

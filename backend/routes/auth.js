@@ -90,17 +90,28 @@ router.post('/login', async (req, res) => {
     }
 });
 
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, 'postmessage');
+
 // @route   POST /api/auth/google
-// @desc    Google Sign-In / Register (with access_token)
+// @desc    Google Sign-In / Register 
 // @access  Public
 router.post('/google', async (req, res) => {
-    const { tokenId: accessToken } = req.body;
+    // The frontend may pass the raw code (if flow: 'auth-code') or the tokenId 
+    const { tokenId: code } = req.body;
 
     try {
-        // Fetch user profile from Google using the access token
-        const googleRes = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+        // Exchange the authorization code for tokens
+        const { tokens } = await client.getToken(code);
         
-        const { name, email, sub: googleId, picture: avatar } = googleRes.data;
+        // Use the id_token to get user info securely
+        const ticket = await client.verifyIdToken({
+            idToken: tokens.id_token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        
+        const payloadFromGoogle = ticket.getPayload();
+        const { name, email, sub: googleId, picture: avatar } = payloadFromGoogle;
 
         let user = await User.findOne({ 
             $or: [
@@ -141,7 +152,7 @@ router.post('/google', async (req, res) => {
             }
         );
     } catch (err) {
-        console.error('Google Auth Error:', err.response?.data || err.message);
+        console.error('Google Auth Error:', err.message);
         res.status(400).json({ msg: 'Google Auth failed' });
     }
 });

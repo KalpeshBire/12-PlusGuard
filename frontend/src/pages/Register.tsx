@@ -70,6 +70,7 @@ export default function Register() {
   const loginWithGoogle = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => toast({ title: "Google Auth Failed", variant: "destructive" }),
+    flow: 'auth-code',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
