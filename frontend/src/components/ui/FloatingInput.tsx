@@ -35,6 +35,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, InputProps>(
             onBlur={() => setIsFocused(false)}
             ref={ref}
             placeholder=" "
+            data-has-value={!!props.value || !!props.defaultValue}
             {...props}
           />
           <label

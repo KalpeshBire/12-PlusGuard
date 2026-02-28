@@ -191,10 +191,11 @@
   }
 
   .floating-input:focus ~ .floating-label,
-  .floating-input:not(:placeholder-shown) ~ .floating-label {
+  .floating-input:not(:placeholder-shown) ~ .floating-label,
+  .floating-input[data-has-value="true"] ~ .floating-label {
     @apply -top-2 translate-y-0 text-xs text-primary font-medium px-1.5;
-    background-color: #020617; /* Matches the AuthLayout background */
-    left: 0.5rem; /* Reset to left when floating */
+    background-color: #0d1117; /* Use a more appropriate dark background color */
+    left: 0.5rem;
   }
 }
 

@@ -146,7 +146,7 @@ router.get('/', auth, async (req, res) => {
         const responseTimeDistribution = Object.keys(distributionMap).map(range => ({ range, count: distributionMap[range] }));
 
         // 7. Bucketing for Charts
-        const buckets = 24;
+        const buckets = 28;
         const bucketSize = durationMs / buckets;
         const responseTimeData = [];
         const uptimeData = [];
@@ -157,17 +157,47 @@ router.get('/', auth, async (req, res) => {
             
             const stats = await Log.aggregate([
                 { $match: { monitorId: { $in: monitorIds }, checkedAt: { $gte: bStart, $lt: bEnd } } },
+                {
+                    $lookup: {
+                        from: 'monitors',
+                        localField: 'monitorId',
+                        foreignField: '_id',
+                        as: 'monitorDetails'
+                    }
+                },
+                { $unwind: "$monitorDetails" },
                 { $group: {
-                    _id: null,
+                    _id: "$monitorDetails.name",
                     avgRT: { $avg: "$responseTime" },
                     up: { $sum: { $cond: [{ $eq: ["$status", "UP"] }, 1, 0] } },
                     total: { $sum: 1 }
                 }}
             ]);
 
-            const label = bStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            responseTimeData.push({ time: label, value: stats[0] ? Math.round(stats[0].avgRT) : 0 });
-            uptimeData.push({ date: label, uptime: stats[0] ? Math.round((stats[0].up / stats[0].total) * 100) : 100 });
+            const timeLabel = bStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const rtPoint = { time: timeLabel };
+            const upPoint = { date: timeLabel };
+            
+            stats.forEach(monitorStat => {
+                rtPoint[monitorStat._id] = Math.round(monitorStat.avgRT || 0);
+                upPoint[monitorStat._id] = Math.round((monitorStat.up / monitorStat.total) * 100);
+            });
+
+            // If a monitor had no logs in this bucket, fill with previous value or 0
+            monitors.forEach(m => {
+                if (rtPoint[m.name] === undefined) {
+                    const prevBucket = responseTimeData[responseTimeData.length - 1];
+                    rtPoint[m.name] = prevBucket ? prevBucket[m.name] : 0;
+                }
+                if (upPoint[m.name] === undefined) {
+                     const prevBucket = uptimeData[uptimeData.length - 1];
+                     upPoint[m.name] = prevBucket ? prevBucket[m.name] : 100;
+                }
+            });
+
+            responseTimeData.push(rtPoint);
+            uptimeData.push(upPoint);
         }
 
         const formatDuration = (ms) => {

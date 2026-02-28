@@ -156,14 +156,35 @@ router.get('/', auth, async (req, res) => {
         const chartLogs = await Log.aggregate([
             { $match: { monitorId: { $in: monitorIds }, checkedAt: { $gte: fromDate } } },
             { $sort: { checkedAt: -1 } },
-            { $limit: 40 },
-            { $sort: { checkedAt: 1 } }
+            { $limit: 100 }, // Get more logs to fill the chart for multiple monitors
+            { $sort: { checkedAt: 1 } },
+            {
+                $lookup: {
+                    from: 'monitors',
+                    localField: 'monitorId',
+                    foreignField: '_id',
+                    as: 'monitorDetails'
+                }
+            },
+            { $unwind: "$monitorDetails" }
         ]);
-            
-        const responseTimeData = chartLogs.map(log => ({
-            time: new Date(log.checkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            value: log.responseTime
-        }));
+
+        // Group by time interval (e.g., minute) to align lines on the X-axis
+        const groupedByTime = {};
+        
+        chartLogs.forEach(log => {
+            const timeKey = new Date(log.checkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (!groupedByTime[timeKey]) {
+                groupedByTime[timeKey] = { time: timeKey };
+            }
+            const monitorName = log.monitorDetails.name;
+            // Only take the first log for this minute per monitor
+            if (groupedByTime[timeKey][monitorName] === undefined) {
+                 groupedByTime[timeKey][monitorName] = log.responseTime;
+            }
+        });
+
+        const responseTimeData = Object.values(groupedByTime);
 
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
