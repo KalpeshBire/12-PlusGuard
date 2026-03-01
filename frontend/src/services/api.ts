@@ -63,7 +63,7 @@ export const authApi = {
   login: (email: string, password: string) => api.post("/auth/login", { email, password }),
   register: (data: { name: string; email: string; password: string }) => api.post("/auth/register", data),
   forgotPassword: (email: string) => api.post("/auth/forgot-password", { email }),
-  google: (code: string) => api.post("/auth/google", { code }),
+  google: (payload: any) => api.post("/auth/google", payload),
 };
 
 export const monitorsApi = {

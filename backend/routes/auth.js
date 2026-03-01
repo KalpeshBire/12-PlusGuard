@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const User = require('../models/User');
+require('dotenv').config();
 
 // @route   POST /api/auth/register
 // @desc    Register user
@@ -90,27 +91,31 @@ router.post('/login', async (req, res) => {
     }
 });
 
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, 'postmessage');
-
 // @route   POST /api/auth/google
 // @desc    Google Sign-In / Register 
 // @access  Public
 router.post('/google', async (req, res) => {
-    // The frontend may pass the raw code (if flow: 'auth-code') 
-    const { code } = req.body;
+    // The frontend passes the payload from useGoogleLogin
+    const googlePayload = req.body;
+    console.log("Full Google payload received from frontend:", JSON.stringify(googlePayload, null, 2));
+    
+    // The implicit flow usually returns access_token, but let's be safe
+    const access_token = googlePayload.access_token || googlePayload.credential;
+
+    if (!access_token) {
+        console.error("No access_token or credential found in the payload");
+        return res.status(400).json({ msg: 'Google Auth failed - No token found' });
+    }
 
     try {
-        // Exchange the authorization code for tokens
-        const { tokens } = await client.getToken(code);
+        console.log("Fetching Google user info with token/credential...");
         
-        // Use the id_token to get user info securely
-        const ticket = await client.verifyIdToken({
-            idToken: tokens.id_token,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
+        // Fetch user info from Google using the access_token
+        const googleResponse = await axios.get(
+            `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
+        );
         
-        const payloadFromGoogle = ticket.getPayload();
+        const payloadFromGoogle = googleResponse.data;
         const { name, email, sub: googleId, picture: avatar } = payloadFromGoogle;
 
         let user = await User.findOne({ 
@@ -152,7 +157,9 @@ router.post('/google', async (req, res) => {
             }
         );
     } catch (err) {
-        console.error('Google Auth Error:', err.message);
+        console.error('Google Auth Error Full Object:', err);
+        console.error('Google Auth Error Message:', err.message);
+        console.error('Token Received:', access_token);
         res.status(400).json({ msg: 'Google Auth failed' });
     }
 });

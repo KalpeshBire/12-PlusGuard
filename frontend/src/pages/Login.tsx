@@ -20,7 +20,7 @@ export default function Login() {
   const handleGoogleSuccess = async (codeResponse: any) => {
     setIsLoading(true);
     try {
-      const res = await authApi.google(codeResponse.code) as any;
+      const res = await authApi.google(codeResponse) as any;
       localStorage.setItem("token", res.token);
       if (res.user) {
         localStorage.setItem("user", JSON.stringify(res.user));
@@ -40,7 +40,6 @@ export default function Login() {
   const loginWithGoogle = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => toast({ title: "Google Login Failed", variant: "destructive" }),
-    flow: 'auth-code',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
