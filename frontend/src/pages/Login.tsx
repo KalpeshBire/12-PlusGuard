@@ -17,10 +17,10 @@ export default function Login() {
   const [error, setError] = useState(false);
   const { toast } = useToast();
 
-  const handleGoogleSuccess = async (tokenResponse: any) => {
+  const handleGoogleSuccess = async (codeResponse: any) => {
     setIsLoading(true);
     try {
-      const res = await authApi.google(tokenResponse.access_token) as any;
+      const res = await authApi.google(codeResponse.code) as any;
       localStorage.setItem("token", res.token);
       if (res.user) {
         localStorage.setItem("user", JSON.stringify(res.user));

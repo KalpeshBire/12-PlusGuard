@@ -97,8 +97,8 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE
 // @desc    Google Sign-In / Register 
 // @access  Public
 router.post('/google', async (req, res) => {
-    // The frontend may pass the raw code (if flow: 'auth-code') or the tokenId 
-    const { tokenId: code } = req.body;
+    // The frontend may pass the raw code (if flow: 'auth-code') 
+    const { code } = req.body;
 
     try {
         // Exchange the authorization code for tokens
