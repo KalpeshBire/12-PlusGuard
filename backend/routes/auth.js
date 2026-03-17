@@ -110,12 +110,22 @@ router.post('/google', async (req, res) => {
     try {
         console.log("Fetching Google user info with token/credential...");
         
-        // Fetch user info from Google using the access_token
-        const googleResponse = await axios.get(
-            `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
-        );
+        let payloadFromGoogle;
         
-        const payloadFromGoogle = googleResponse.data;
+        if (googlePayload.credential) {
+            // It's an ID Token (from new official GoogleLogin component)
+            const googleResponse = await axios.get(
+                `https://oauth2.googleapis.com/tokeninfo?id_token=${googlePayload.credential}`
+            );
+            payloadFromGoogle = googleResponse.data;
+        } else {
+            // It's an access_token (from implicit flow)
+            const googleResponse = await axios.get(
+                `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
+            );
+            payloadFromGoogle = googleResponse.data;
+        }
+        
         const { name, email, sub: googleId, picture: avatar } = payloadFromGoogle;
 
         let user = await User.findOne({ 

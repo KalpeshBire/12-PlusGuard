@@ -1,11 +1,13 @@
 const Monitor = require('../models/Monitor');
 const { processMonitor } = require('./worker');
+const cron = require('node-cron');
 
 let isRunning = false;
 
 const startScheduler = () => {
     console.log('Scheduler Loop started...');
     
+    // 1. Existing interval-based scheduler for dynamic monitor polling
     // Poll the database every 10 seconds to see if any websites need pinging
     setInterval(async () => {
         // Prevent overlap if pings take longer than 10s combined
@@ -36,6 +38,15 @@ const startScheduler = () => {
             isRunning = false;
         }
     }, 10000); // 10s loop
+
+    // 2. New node-cron implementation for fixed-interval background tasks
+    // This runs every 10 minutes
+    cron.schedule('*/10 * * * *', () => {
+        console.log(`[${new Date().toISOString()}] Cron Heartbeat: Running scheduled 10-minute task...`);
+        // Add additional system maintenance tasks here if needed
+    });
+
+    console.log('Cron 10-minute task registered.');
 };
 
 module.exports = { startScheduler };
